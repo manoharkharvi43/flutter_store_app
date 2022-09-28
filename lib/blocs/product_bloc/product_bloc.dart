@@ -6,6 +6,7 @@ import 'package:store_app/repository/product_repository.dart';
 class ProductBloc extends Bloc<LoadProductEvent, ProductState> {
   final ProductRepo productRepository;
   var allProducts = ProductRepo();
+
   ProductBloc({
     required this.productRepository
 }) : super(ProductLoadingState()) {

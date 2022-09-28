@@ -11,7 +11,7 @@ class _NotificationState extends State<AppNotification> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      child:Text("Notification")
+      child:Center(child: Text("Notification"))
     );
   }
 }

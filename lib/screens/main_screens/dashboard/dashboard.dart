@@ -21,14 +21,19 @@ class _DashboardState extends State<Dashboard> {
     AppNotification(),
     Settings()
   ];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       bottomNavigationBar: _bottomNavBar(_selectedIndex),
-      body: BlocProvider(
-        create: (context) => ProductBloc(
-          productRepository: ProductRepo(),
-        ) ,
+      body: MultiBlocProvider(
+        providers: [
+          BlocProvider(
+            lazy: false,
+              create: (context) => ProductBloc(
+                    productRepository: ProductRepo(),
+                  )),
+        ],
         child: SafeArea(
           child: _widgetOptions.elementAt(_selectedIndex),
         ),

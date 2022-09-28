@@ -4,8 +4,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:store_app/blocs/product_bloc/product_bloc.dart';
 import 'package:store_app/blocs/product_bloc/product_event.dart';
 import 'package:store_app/blocs/product_bloc/product_state.dart';
-import 'package:store_app/repository/product_repository.dart';
-import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -29,39 +27,71 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Products"),
-        backgroundColor: Colors.amber[800],
-        automaticallyImplyLeading: false,
-      ),
-      body: BlocBuilder<ProductBloc, ProductState>(
-        builder: (context, state) {
-          print("state.products ${state}");
-          if (state is ProductLoadingState) {
-            return Center(child: CircularProgressIndicator());
-          }
-          if (state is ProductLoadedState) {
-            return GridView.count(
-              crossAxisCount: 2,
-              children: List.generate(
-                  state.products.length,
-                  (index) => ProductContainer(
-                      title: state.products[index].title,
-                      image: state.products[index].image,
-                      price: state.products[index].price,
-                      category: state.products[index].category,
-                      ratings: state.products[index].ratings)),
-            );
-          }
-          if (state is ProductErrorState) {
-            return Container(
-              child: Text(state.error.toString()),
-            );
-          }
-          return Container();
-        },
-      ),
-    );
+        // appBar: AppBar(
+        //   title: Text("Products"),
+        //   backgroundColor: Colors.amber[800],
+        //   automaticallyImplyLeading: false,
+        // ),
+        body: Column(
+      children: [
+        Flexible(
+          child: Container(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  "Hi Manohar",
+                  style: TextStyle(fontSize: 17, fontWeight: FontWeight.w800),
+                ),
+                CircleAvatar(
+                    child: ClipOval(
+                  child: Image.network(
+                      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSe8ma2KIUHWy3owG081-6NGNCMFbFtH6oI7A&usqp=CAU"),
+                ))
+              ],
+            ),
+            decoration: BoxDecoration(
+                color: Colors.orange[200],
+                borderRadius: BorderRadius.circular(10)),
+          ),
+          flex: 0,
+          fit: FlexFit.loose,
+        ),
+        Flexible(
+          child: BlocBuilder<ProductBloc, ProductState>(
+            builder: (context, state) {
+              if (state is ProductLoadingState) {
+                return Center(child: CircularProgressIndicator());
+              }
+              if (state is ProductLoadedState) {
+                return GridView.count(
+                  crossAxisCount: 2,
+                  children: List.generate(
+                      state.products.length,
+                      (index) => ProductContainer(
+                            title: state.products[index].title,
+                            image: state.products[index].image,
+                            price: state.products[index].price,
+                            category: state.products[index].category,
+                            ratings: state.products[index].ratings,
+                            totalRatings: state.products[index].ratingCount,
+                          )),
+                );
+              }
+              if (state is ProductErrorState) {
+                return Container(
+                  child: Text(state.error.toString()),
+                );
+              }
+              return Container();
+            },
+
+          ),
+          flex: 9,
+        )
+      ],
+    ));
   }
 }
 // ListView.builder(
@@ -74,19 +104,21 @@ class _HomePageState extends State<HomePage> {
 // });
 
 class ProductContainer extends StatefulWidget {
-  const ProductContainer(
-      {Key? key,
-      required this.title,
-      required this.image,
-      required this.price,
-      required this.category,
-      required this.ratings})
-      : super(key: key);
+  const ProductContainer({
+    Key? key,
+    required this.title,
+    required this.image,
+    required this.price,
+    required this.category,
+    required this.ratings,
+    required this.totalRatings,
+  }) : super(key: key);
   final String title;
   final String image;
   final String price;
   final String category;
   final String ratings;
+  final String totalRatings;
   @override
   State<ProductContainer> createState() => _ProductContainerState();
 }
@@ -128,24 +160,20 @@ class _ProductContainerState extends State<ProductContainer> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text("Rating ${widget.ratings}", style: TextStyle(fontSize: 15)),
-              // Text("${widget.category}" , style: TextStyle(fontSize: 15))
-              RatingBar.builder(
-                initialRating: double.parse(widget.ratings),
-                minRating: 1,
-                direction: Axis.horizontal,
-                allowHalfRating: true,
-                itemCount: 5,
-                tapOnlyMode: false,
-                updateOnDrag: false,
-                itemPadding: EdgeInsets.symmetric(horizontal: 4.0),
-                itemBuilder: (context, _) => Icon(
-                  Icons.star,
-                  color: Colors.amber,
-                ),
-                onRatingUpdate: (rating) {},
-                itemSize: 15,
+              Row(
+                children: [
+                  Text("Rating ${widget.ratings}",
+                      style: TextStyle(fontSize: 15)),
+                  Icon(
+                    Icons.star,
+                    color: Colors.orangeAccent,
+                    size: 20,
+                  ),
+                  Text("(${widget.totalRatings})",
+                      style: TextStyle(fontSize: 15)),
+                ],
               )
+              // Text("${widget.category}" , style: TextStyle(fontSize: 15))
             ],
           ),
         ],
